@@ -1,7 +1,7 @@
 {
   "name": "claude-mods",
   "description": "非エンジニアでも使いやすい Claude Code の mod 集：TODO・バトン通知・使用率表示・Status メニュー",
-  "owner": { "name": "Azusa Katsumizu" },
+  "owner": { "name": "Claude Code Club" },
   "plugins": [
     { "name": "status", "source": "./status", "description": "入力欄の上の Status メニュー。TODO・通知・使用率の設定、よく使うスラッシュコマンドの★とコマンド一覧" },
     { "name": "today", "source": "./today", "description": "TODO を Today・◎・○・△ で管理。右下に今日の件数、一覧の画面からボタンで移動・完了" },

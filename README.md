@@ -61,4 +61,4 @@ claude plugin test ./status
 
 ## ライセンス
 
-MIT
+MIT（Claude Code Club）

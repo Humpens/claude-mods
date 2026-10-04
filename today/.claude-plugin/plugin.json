@@ -10,5 +10,9 @@
       "description": "使う todo.md の場所（例：~/Documents/todo.md）。空なら ~/todo.md。無ければ最初に書き込むときに作る",
       "default": ""
     }
-  }
+  },
+  "author": {
+    "name": "Claude Code Club"
+  },
+  "license": "MIT"
 }
