@@ -1,0 +1,1 @@
+{ "name": "u", "version": "0.1.0", "description": "5時間・1週間・Fable の使用率と API 換算の料金を右下に表示する", "types": "./types/index.d.ts" }

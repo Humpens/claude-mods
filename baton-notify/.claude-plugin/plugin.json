@@ -1,0 +1,6 @@
+{
+  "name": "baton-notify",
+  "version": "0.1.0",
+  "description": "Claude からバトンが渡ったとき（完了・質問・許可待ち）に、どのセッションかが分かる Mac の通知を出す",
+  "types": "./types/index.d.ts"
+}
