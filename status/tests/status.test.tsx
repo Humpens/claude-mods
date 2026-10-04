@@ -59,6 +59,11 @@ test('打ったコマンドは「最近使ったコマンド」に出る', async
   await band.unmount()
 })
 
+test('v2 の一覧を持っている人には、goal・background・codex:review が rewind の後ろに足される', () => {
+  const v2 = { version: 2, isHidden: false, commands: [{ name: 'rewind', desc: 'x', isFavorite: false }, { name: 'mine', desc: '自分の', isFavorite: true }] }
+  expect(migrate(v2).commands?.map(c => c.name)).toEqual(['rewind', 'goal', 'background', 'codex:review', 'mine'])
+})
+
 test('翻訳の返事を読み取る（日本語の行だけ）', () => {
   expect(parseTranslations('init\tCLAUDE.md を作る\n/review｜レビューする\nfoo\tbar')).toEqual({ init: 'CLAUDE.md を作る', review: 'レビューする' })
 })

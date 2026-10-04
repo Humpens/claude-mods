@@ -21,6 +21,9 @@ export const DEFAULT_COMMANDS: SlashCommand[] = [
   { name: 'usage', desc: '使用量を見る', isFavorite: false },
   { name: 'resume', desc: '前の会話を再開', isFavorite: false },
   { name: 'rewind', desc: '少し前に戻す', isFavorite: false },
+  { name: 'goal', desc: '終わるまで自動で続ける', isFavorite: false },
+  { name: 'background', desc: '裏で作業を続ける', isFavorite: false },
+  { name: 'codex:review', desc: 'Codexにレビューを頼む', isFavorite: false },
   { name: 'todo', desc: 'TODO一覧を開く', isFavorite: true },
   { name: 'todo-sync', desc: 'TODOを集めて整理', isFavorite: false },
   { name: 'baton', desc: '通知の設定', isFavorite: false },
@@ -29,13 +32,26 @@ export const DEFAULT_COMMANDS: SlashCommand[] = [
 
 // 以前のおすすめ（v1）。v2 に入れ替えるとき、使う人が自分で足したものと★だけ引き継ぐ
 const V1_NAMES = ['todo', 'compact', 'clear', 'baton', 'meter', 'context', 'usage', 'model', 'todo-sync', 'code-review']
-const PREFS_VERSION = 2
+const PREFS_VERSION = 3
+// v3 で足したおすすめ。v2 の一覧を持っている人には、rewind の後ろに差し込む
+const ADDED_V3 = ['goal', 'background', 'codex:review']
+
+const addV3 = (list: SlashCommand[]) => {
+  const missing = DEFAULT_COMMANDS.filter(c => ADDED_V3.includes(c.name) && !list.some(x => x.name === c.name))
+  if (missing.length === 0) return list
+  const at = list.findIndex(c => c.name === 'rewind')
+  const pos = at === -1 ? list.length : at + 1
+  return [...list.slice(0, pos), ...missing, ...list.slice(pos)]
+}
 
 export const migrate = (stored: Partial<Prefs> & { version?: number }): Partial<Prefs> & { version: number } => {
   // おすすめの説明は、いつも最新の（短い）文言にそろえる
   const fresh = new Map(DEFAULT_COMMANDS.map(c => [c.name, c.desc]))
   const syncDesc = (list: SlashCommand[]) => list.map(c => (fresh.has(c.name) ? { ...c, desc: fresh.get(c.name) ?? c.desc } : c))
-  if ((stored.version ?? 1) >= PREFS_VERSION || !stored.commands) return { ...stored, ...(stored.commands ? { commands: syncDesc(stored.commands) } : {}), version: PREFS_VERSION }
+  const version = stored.version ?? 1
+  if (!stored.commands) return { ...stored, version: PREFS_VERSION }
+  if (version >= PREFS_VERSION) return { ...stored, commands: syncDesc(stored.commands), version: PREFS_VERSION }
+  if (version === 2) return { ...stored, commands: syncDesc(addV3(stored.commands)), version: PREFS_VERSION }
   const favorites = new Set(stored.commands.filter(c => c.isFavorite).map(c => c.name))
   const defaults = new Set(DEFAULT_COMMANDS.map(c => c.name))
   const mine = stored.commands.filter(c => !V1_NAMES.includes(c.name) && !defaults.has(c.name))
