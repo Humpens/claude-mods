@@ -10,7 +10,7 @@ const setup = (on: Parameters<Parameters<typeof test>[1]>[1]) => {
   on('process.run', (_, e) => (runs.push([...(e as { argv: string[] }).argv]), { value: { exitCode: 0, stdout: '', stderr: '', isStdoutTruncated: false } }))
   on('store.get', (_, e) => ({ value: store.get((e as { key: string }).key) }))
   on('store.set', (_, e) => (store.set((e as { key: string }).key, (e as { value: unknown }).value), { value: undefined }))
-  on('session.cwd', () => ({ value: '/Users/x/Desktop/ai/my-secretary' }))
+  on('session.cwd', () => ({ value: '/Users/x/Desktop/my-project' }))
   on('session.messages', () => ({ value: [{ role: 'user', text: 'TODOを確認して', toolUses: [] }] }))
   on('ui.open', () => ({ value: { isPlaced: true } }))
   return { runs, store }
