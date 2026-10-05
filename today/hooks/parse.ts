@@ -127,8 +127,33 @@ export const uncompleteTask = (md: string, num: string): string | null => {
   return lines.join('\n')
 }
 
-export const nextNumber = (md: string) =>
-  Math.max(0, ...[...md.matchAll(/#(\d+)/g)].map(m => Number(m[1])).filter(n => n < 10000)) + 1
+// 新しいタスクの番号：空いている番号のうち、いちばん小さいもの（2026-10-05 あずささんのルール）
+// 「使用中」＝TODAY・🔴・⏳・🟡・⚪・🔁 の見出しの下に出てくる #番号すべて。
+// - タスク自身の番号だけでなく、ほかのタスクの本文で参照されている番号も使用中（参照が残っている番号は後回し）
+// - 今日 ✓ を付けた完了タスクも、夜の整理で消えるまでは行が残るので使用中（同じ日に1つの番号が2つの意味を持たない）
+// - 進捗ログ・冒頭の説明など、それ以外の見出しの下の番号は昔の記録なので数えない
+const isTaskHeading = (line: string) => tierOfHeading(line) !== null || line.startsWith('## 🔁')
+
+export const usedNumbers = (md: string) => {
+  const used = new Set<number>()
+  let inTasks = false
+  for (const line of md.split('\n')) {
+    if (line.startsWith('## ')) {
+      inTasks = isTaskHeading(line)
+      continue
+    }
+    if (!inTasks) continue
+    for (const m of line.matchAll(/#(\d+)/g)) used.add(Number(m[1]))
+  }
+  return used
+}
+
+export const nextNumber = (md: string) => {
+  const used = usedNumbers(md)
+  let n = 1
+  while (used.has(n)) n++
+  return n
+}
 
 export const addTask = (md: string, title: string, project: string, tier: Tier): { md: string; num: number } | null => {
   const lines = ensureToday(md.split('\n'))

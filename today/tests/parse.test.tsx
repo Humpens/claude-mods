@@ -1,6 +1,6 @@
 import { expect, mock, test } from 'claude-code/testing'
 
-import { addTask, completeTask, moveTask, parseTodo, returnTask } from '../hooks/parse'
+import { addTask, completeTask, moveTask, nextNumber, parseTodo, returnTask } from '../hooks/parse'
 import { resolvePath, TEMPLATE } from '../hooks/register'
 
 const MD = [
@@ -44,6 +44,28 @@ test('TODO の場所：空なら ~/todo.md、~ はホームに置きかえる。
   expect(addTask(TEMPLATE, '最初のタスク', '', 'today')?.md).toContain('## TODAY\n\n- [ ] 〔未分類〕**#1** **最初のタスク**')
 })
 
+test('番号は空いている小さいものから。本文で参照されている番号・今日完了した番号・定期タスクは使わない', () => {
+  const md = [
+    '# TODO',
+    '> 最終更新：#1 と #2 は欠番（冒頭の説明は数えない）',
+    '## 🔴 最優先でやりたい',
+    '- [ ] 〔仕事〕**#3** **見積もり**（#4 の撮影準備とセットで）',
+    '- [x] 〔仕事〕**#5** **請求**（10/5 完了）',
+    '## ⏳ 相手待ち',
+    '- [ ] 〔仕事〕**#7** 返事待ち',
+    '## 🔁 定期タスク',
+    '- [ ] 〔仕事〕**#6** 毎月の締め',
+    '## 📋 進捗ログ',
+    '- #1・#2 は空き（再利用可）',
+  ].join('\n')
+  expect(nextNumber(md)).toBe(1)
+  const two = addTask(md, '一つ目', '', 'red')!
+  expect(two.num).toBe(1)
+  expect(nextNumber(two.md)).toBe(2)
+  const three = addTask(addTask(two.md, '二つ目', '', 'red')!.md, '三つ目', '', 'red')!
+  expect(three.num).toBe(8)
+})
+
 test('今日へ移す→元に戻す→段階を変える→完了→追加', () => {
   let md = moveTask(MD, '52', 'today')!
   expect(tiers(md)[0]).toBe('today:52')
@@ -57,8 +79,8 @@ test('今日へ移す→元に戻す→段階を変える→完了→追加', ()
   expect(tiers(md)).not.toContain('red:73')
   expect(parseTodo(md).find(i => i.num === '73')).toEqual({ tier: 'done', num: '73', project: '副業', title: '書類を返送', from: 'red' })
   const added = addTask(md, '新しいこと', '副業', 'today')!
-  expect(added.num).toBe(112)
-  expect(tiers(added.md)[0]).toBe('today:112')
+  expect(added.num).toBe(1)
+  expect(tiers(added.md)[0]).toBe('today:1')
   expect(moveTask(md, '9999', 'red')).toBeNull()
 })
 
