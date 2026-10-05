@@ -87,7 +87,7 @@ const refresh = async ($: EngineInterface, usage?: Usage) => {
 const placedNote = (opened: { isPlaced: boolean; reason?: string }) => (opened.isPlaced ? '' : `（まだ表示されていません：${opened.reason ?? '画面の幅が足りない可能性'}）`)
 
 const OPTIONS: { key: keyof Display; label: string }[] = [
-  { key: 'show', label: '右下に表示する' },
+  { key: 'show', label: 'ステータスバーに表示する' },
   { key: 'fiveHour', label: '5h（5時間の制限）' },
   { key: 'sevenDay', label: '7d（週の制限）' },
   { key: 'reset', label: '5h のリセット時刻（→10:10）' },
@@ -114,7 +114,7 @@ export const register: Register = on => {
 
   on('command.run', { command: 'meter' }, async ($, e) => {
     const arg = e.args.trim()
-    // Status の Settings から /meter off で右下の表示ごと止める
+    // Menu の Settings から /meter off でステータスバーの表示ごと止める
     if (arg === 'on' || arg === 'off') {
       const next = { ...(await loadDisplay($)), show: arg === 'on' }
       await $.store.set(STORE_KEY, next)
@@ -144,7 +144,7 @@ export const register: Register = on => {
     return (
       <Box flexDirection="column" gap={1}>
         <Box flexDirection="column">
-          <Text bold>右下に出すもの</Text>
+          <Text bold>ステータスバーに出すもの</Text>
           <Text dimColor>{`いまの表示：${statusText(usage, d) ?? '（なし）'}`}</Text>
           <Box flexDirection="row" flexWrap="wrap" gap={1}>
             {OPTIONS.map(o => (

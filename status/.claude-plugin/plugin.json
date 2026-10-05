@@ -1,7 +1,7 @@
 {
   "name": "status",
   "version": "0.1.0",
-  "description": "入力欄の上の Status ボタンから、TODO・通知・使用率表示の設定を開く",
+  "description": "ツールバー（入力欄の上）の Menu から、TODO・通知・使用率表示の設定を開く",
   "types": "./types/index.d.ts",
   "author": {
     "name": "Claude Code Club"

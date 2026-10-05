@@ -65,10 +65,10 @@ const DEFAULT_PREFS: Prefs = { isHidden: false, commands: DEFAULT_COMMANDS, feat
 
 // Settings で選べる機能。オフにすると、その mod 自身にも /〇〇 off を送って表示や通知ごと止める
 export const FEATURES: { key: FeatureKey; label: string; desc: string; command?: string }[] = [
-  { key: 'todo', label: 'TODO', desc: 'TODO の一覧・Today・右下の件数', command: 'todo' },
+  { key: 'todo', label: 'TODO', desc: 'TODO の一覧・Today・ステータスバーの件数', command: 'todo' },
   { key: 'notify', label: 'Notifications', desc: '作業完了・質問・許可待ちの Mac 通知', command: 'baton' },
-  { key: 'usage', label: 'Usage display', desc: '右下の 5h・7d・料金の表示', command: 'meter' },
-  { key: 'commands', label: 'Slash commands', desc: 'バー右側の ★ と / のコマンド一覧' },
+  { key: 'usage', label: 'Usage display', desc: 'ステータスバーの 5h・7d・料金の表示', command: 'meter' },
+  { key: 'commands', label: 'Slash commands', desc: 'ツールバー右側の ★ と / のコマンド一覧' },
 ]
 
 const isOpen = atom({ plugin: 'status', key: 'isOpen' } as const, false)
@@ -216,7 +216,7 @@ const toggleFavorite = (name: string) => (p: Prefs): Prefs => ({
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
-    await $.command.register({ name: 's', description: 'Status メニューを開く（TODO・通知・使用率・コマンド一覧）' })
+    await $.command.register({ name: 's', description: 'Menu を開く（TODO・通知・使用率・コマンド一覧・設定）' })
     await load($)
     // 一覧を開く前に、裏で説明の翻訳を済ませておく（ほかの mod やスキルが読み込み終わるのを少し待ってから一度だけ）
     const stop = $.clock.every(20_000, () => {
@@ -243,12 +243,12 @@ export const register: Register = on => {
 
   on('command.run', { command: 's' }, async $ => {
     await load($)
-    await $.ui.open({ id: MENU_PANE, title: 'Status' })
+    await $.ui.open({ id: MENU_PANE, title: 'Menu' })
 
-    return { text: 'Status メニューを開きました。' }
+    return { text: 'Menu を開きました。' }
   })
 
-  // 入力欄の上の帯：左に Status、右にお気に入りのコマンドと「/」
+  // ツールバー（入力欄の上の帯）：左に Menu、右にお気に入りのコマンドと「/」
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     if (e.props.hasSurvey) return next(e)
     const p = await read($, prefs)
@@ -262,7 +262,7 @@ export const register: Register = on => {
     return (
       <Box flexDirection="row" justifyContent="space-between" gap={1}>
         <Box flexDirection="row" gap={1}>
-          <Button key="status" label={open ? 'Status ▾' : 'Status ▸'} plain dimColor={!open} onPress={() => void update($, isOpen, now => !now)} />
+          <Button key="status" label={open ? 'Menu ▾' : 'Menu ▸'} plain dimColor={!open} onPress={() => void update($, isOpen, now => !now)} />
           {open &&
             menu.map(item => (
               <Button key={item.key} label={item.label} hotkey={item.hotkey} variant="secondary" onPress={() => void runCommand($, item.command)} />
@@ -277,7 +277,7 @@ export const register: Register = on => {
               onPress={async () => {
                 await save($, now => ({ ...now, isHidden: true }))
                 await update($, isOpen, () => false)
-                $.ui.toast('バーを消しました。メニューは /s で開けます')
+                $.ui.toast('ツールバーを消しました。メニューは /s で開けます')
               }}
             />
           )}
@@ -308,7 +308,7 @@ export const register: Register = on => {
         </Box>
         <Button
           key="m-bar"
-          label={p.isHidden ? '入力欄の上のバーを表示する' : '入力欄の上のバーを消す（/s で開く）'}
+          label={p.isHidden ? 'ツールバーを表示する' : 'ツールバーを消す（/s で開く）'}
           hotkey="b"
           variant={p.isHidden ? 'primary' : 'secondary'}
           onPress={() => void save($, now => ({ ...now, isHidden: !now.isHidden }))}
@@ -340,7 +340,7 @@ export const register: Register = on => {
         ))}
         <Button
           key="s-bar"
-          label={p.isHidden ? '入力欄の上のバーを表示する' : '入力欄の上のバーを消す（/s で開く）'}
+          label={p.isHidden ? 'ツールバーを表示する' : 'ツールバーを消す（/s で開く）'}
           variant="secondary"
           onPress={() => void save($, now => ({ ...now, isHidden: !now.isHidden }))}
         />
@@ -363,7 +363,7 @@ export const register: Register = on => {
 
     return (
       <Box flexDirection="column" gap={1}>
-        <Text dimColor>名前を押すとチャット欄に入ります。★ を付けると入力欄の上にいつも出ます。</Text>
+        <Text dimColor>名前を押すとチャット欄に入ります。★ を付けるとツールバーにいつも出ます。</Text>
         {recentShown.length > 0 && (
           <Box flexDirection="column">
             <Text bold>最近使ったコマンド</Text>

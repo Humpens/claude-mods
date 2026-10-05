@@ -53,9 +53,9 @@ const countOf = (items: TodoItem[], tier: Tier) => items.filter(item => item.tie
 const summary = (items: TodoItem[]) =>
   `${countOf(items, 'today')} ｜ ◎${countOf(items, 'red')}`
 
-// 機能ごとオフにできる（Status の Settings から /todo off）。設定は全セッション共通
+// 機能ごとオフにできる（Menu の Settings から /todo off）。設定は全セッション共通
 const isEnabled = async ($: EngineInterface) => (await $.store.get('enabled')) !== false
-const OFF_TEXT = 'TODO の機能はオフになっています。/todo on か、Status → Settings で戻せます。'
+const OFF_TEXT = 'TODO の機能はオフになっています。/todo on か、Menu → Settings で戻せます。'
 
 const refresh = async ($: EngineInterface) => {
   if (!(await isEnabled($))) {

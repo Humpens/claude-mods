@@ -1,7 +1,7 @@
 {
   "name": "today",
   "version": "0.1.0",
-  "description": "TODO を Today・◎・○・△ の段階で管理し、右下に今日の件数を出す。一覧の画面からボタンで移動・完了できる",
+  "description": "TODO を Today・◎・○・△ の段階で管理し、ステータスバーに今日の件数を出す。一覧の画面からボタンで移動・完了できる",
   "types": "./types/index.d.ts",
   "userConfig": {
     "todoPath": {
